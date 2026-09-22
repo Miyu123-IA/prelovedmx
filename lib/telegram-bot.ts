@@ -1,4 +1,4 @@
-import { actualizarEstatusProducto, crearProducto, listarProductos } from './db';
+import { actualizarEstatusProducto, actualizarPrecioProducto, crearProducto, listarProductos } from './db';
 import { subirFoto } from './fotos';
 import { obtenerEstadoBot, guardarEstadoBot, limpiarEstadoBot, type EstadoBot } from './sheets';
 import { enviarMensaje, responderCallback, obtenerArchivo, type TelegramUpdate } from './telegram';
@@ -127,6 +127,22 @@ async function manejarTexto(chatId: number, texto: string) {
       return;
     }
     await enviarMensaje(chatId, `${producto.nombre} ahora está <b>${estatus}</b>.`);
+    return;
+  }
+
+  if (comando === '/precio') {
+    const [, id, precioTexto] = texto.trim().split(/\s+/);
+    const precio = Number(precioTexto?.replace(/[^\d.]/g, ''));
+    if (!id || !precio || precio <= 0) {
+      await enviarMensaje(chatId, 'Uso: /precio ID NUEVO_PRECIO (ej. /precio pmud9x5jjg7 450)');
+      return;
+    }
+    const producto = await actualizarPrecioProducto(id, precio);
+    if (!producto) {
+      await enviarMensaje(chatId, `No encontré ningún producto con ID ${id}.`);
+      return;
+    }
+    await enviarMensaje(chatId, `${producto.nombre} ahora cuesta <b>${formatoMXN(producto.precio_venta)}</b>.`);
     return;
   }
 

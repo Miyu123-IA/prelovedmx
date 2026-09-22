@@ -278,6 +278,19 @@ export async function actualizarEstatusProductoSheet(id: string, estatus: Estatu
   return obtenerProductoSheet(id);
 }
 
+export async function actualizarPrecioProductoSheet(id: string, precio: number): Promise<Producto | undefined> {
+  const fila = await encontrarFila(HOJA_PRODUCTOS, COLUMNAS_PRODUCTOS, id);
+  if (!fila) return undefined;
+  const colPrecio = COLUMNAS_PRODUCTOS.indexOf('precio_venta');
+  await sheetsClient().spreadsheets.values.update({
+    spreadsheetId: SHEET_ID,
+    range: `${HOJA_PRODUCTOS}!${colLetter(colPrecio)}${fila}`,
+    valueInputOption: 'USER_ENTERED',
+    requestBody: { values: [[precio]] },
+  });
+  return obtenerProductoSheet(id);
+}
+
 export async function marcasDisponiblesSheet(): Promise<string[]> {
   const productos = await listarProductosSheet();
   return Array.from(new Set(productos.map((p) => p.marca))).sort();

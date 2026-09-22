@@ -149,6 +149,16 @@ export async function actualizarEstatusProducto(id: string, estatus: Estatus): P
   return productos[idx];
 }
 
+export async function actualizarPrecioProducto(id: string, precio: number): Promise<Producto | undefined> {
+  if (sheets.sheetsConfigurado()) return sheets.actualizarPrecioProductoSheet(id, precio);
+  const productos = leerJSON<Producto[]>(PRODUCTS_FILE, []);
+  const idx = productos.findIndex((p) => p.id === id);
+  if (idx === -1) return undefined;
+  productos[idx].precio_venta = precio;
+  escribirJSON(PRODUCTS_FILE, productos);
+  return productos[idx];
+}
+
 export async function marcasDisponibles(): Promise<string[]> {
   if (sheets.sheetsConfigurado()) {
     return leerConFallback(

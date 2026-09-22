@@ -1,13 +1,19 @@
 import Link from 'next/link';
 import { listarProductos, marcasDisponibles } from '@/lib/db';
 import ProductCard from '@/components/ProductCard';
-import { TIENDA } from '@/lib/utils';
+import HeroShowcase from '@/components/HeroShowcase';
+import { TIENDA, tieneFotoReal } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
-  const recientes = (await listarProductos({ estatus: 'disponible', orden: 'recientes' })).slice(0, 4);
+  const disponibles = await listarProductos({ estatus: 'disponible', orden: 'recientes' });
+  const recientes = disponibles.slice(0, 4);
   const marcas = await marcasDisponibles();
+  const fotosDestacadas = disponibles
+    .filter((p) => tieneFotoReal(p.fotos))
+    .flatMap((p) => p.fotos)
+    .slice(0, 8);
 
   return (
     <div>
@@ -33,11 +39,8 @@ export default async function HomePage() {
               </Link>
             </div>
           </div>
-          <div className="hidden grid-cols-2 gap-3 md:grid">
-            <div className="aspect-square rounded-card bg-olivo/30" />
-            <div className="mt-6 aspect-square rounded-card bg-mostaza/30" />
-            <div className="-mt-6 aspect-square rounded-card bg-terracota/30" />
-            <div className="aspect-square rounded-card bg-crema-light/20" />
+          <div className="hidden md:block">
+            <HeroShowcase fotos={fotosDestacadas} />
           </div>
         </div>
       </section>

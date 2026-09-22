@@ -42,6 +42,12 @@ const config: Config = {
       boxShadow: {
         card: '0 2px 10px -2px rgba(43, 37, 32, 0.15)',
       },
+      keyframes: {
+        fadein: {
+          from: { opacity: '0' },
+          to: { opacity: '1' },
+        },
+      },
     },
   },
   plugins: [],
