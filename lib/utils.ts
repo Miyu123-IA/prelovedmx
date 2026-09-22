@@ -17,9 +17,15 @@ export function linkWhatsApp(mensaje: string, numero: string = TIENDA.whatsapp):
   return `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
 }
 
+/** "placeholder" es el valor que usan los 8 productos de ejemplo iniciales. */
+export function tieneFotoReal(fotos: string[]): boolean {
+  return fotos.length > 0 && fotos[0] !== 'placeholder';
+}
+
 export const CATEGORIAS: Record<string, string> = {
   playeras: 'Playeras',
   camisas: 'Camisas',
+  blusas: 'Blusas',
   pantalones: 'Pantalones',
   chamarras: 'Chamarras',
   vestidos: 'Vestidos',

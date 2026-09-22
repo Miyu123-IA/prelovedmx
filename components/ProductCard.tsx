@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import type { Producto } from '@/lib/types';
-import { ESTATUS_LABEL, formatoMXN } from '@/lib/utils';
+import { ESTATUS_LABEL, formatoMXN, tieneFotoReal } from '@/lib/utils';
 import ProductPhoto from './ProductPhoto';
 import Badge from './Badge';
 
@@ -13,7 +13,12 @@ export default function ProductCard({ producto }: { producto: Producto }) {
       className="group block overflow-hidden rounded-card bg-crema-light shadow-card transition hover:-translate-y-1 hover:shadow-lg"
     >
       <div className="relative aspect-[4/5]">
-        <ProductPhoto categoria={producto.categoria} genero={producto.genero} className="h-full w-full" />
+        {tieneFotoReal(producto.fotos) ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={producto.fotos[0]} alt={producto.nombre} className="h-full w-full object-cover" />
+        ) : (
+          <ProductPhoto categoria={producto.categoria} genero={producto.genero} className="h-full w-full" />
+        )}
         {noDisponible && (
           <div className="absolute inset-0 flex items-center justify-center bg-tinta/40">
             <Badge tipo={producto.estatus}>{ESTATUS_LABEL[producto.estatus]}</Badge>

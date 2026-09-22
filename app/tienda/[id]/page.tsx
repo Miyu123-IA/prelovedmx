@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { obtenerProducto } from '@/lib/db';
-import ProductPhoto from '@/components/ProductPhoto';
+import ProductGallery from '@/components/ProductGallery';
 import Badge from '@/components/Badge';
 import AddToCartButton from '@/components/AddToCartButton';
 import { CATEGORIAS, ESTATUS_LABEL, GENEROS, formatoMXN } from '@/lib/utils';
@@ -14,18 +14,13 @@ export default async function ProductoPage({ params }: Props) {
   if (!producto) notFound();
 
   const medidasLegibles = Object.entries(producto.medidas)
-    .filter(([k]) => k !== 'nota')
+    .filter(([k, v]) => k !== 'nota' && v != null && v !== '')
     .map(([k, v]) => `${k.replace('_cm', '').replace('_', ' ')}: ${v} cm`);
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
       <div className="grid gap-8 md:grid-cols-2">
-        <div className="relative aspect-square overflow-hidden rounded-card">
-          <ProductPhoto categoria={producto.categoria} genero={producto.genero} className="h-full w-full" />
-          <div className="absolute right-3 top-3">
-            <Badge tipo="unica">Pieza única</Badge>
-          </div>
-        </div>
+        <ProductGallery fotos={producto.fotos} categoria={producto.categoria} genero={producto.genero} nombre={producto.nombre} />
 
         <div>
           <p className="text-sm uppercase tracking-wide text-tierra-light">{producto.marca}</p>

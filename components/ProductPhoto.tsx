@@ -14,6 +14,7 @@ const ICONOS: Record<Categoria, string> = {
   pantalones: 'M 36 15 L 64 15 L 66 85 L 54 85 L 50 45 L 46 85 L 34 85 Z',
   chamarras:
     'M 33 22 L 45 14 L 55 14 L 67 22 L 73 35 L 64 40 L 64 86 L 36 86 L 36 40 L 27 35 Z M 50 14 L 50 45',
+  blusas: 'M 38 22 C 38 17 44 14 50 14 C 56 14 62 17 62 22 L 71 29 L 63 36 L 60 33 L 63 86 L 37 86 L 40 33 L 37 36 L 29 29 Z',
   vestidos: 'M 42 15 L 58 15 L 62 32 L 74 85 L 26 85 L 38 32 Z',
   sudaderas:
     'M 50 12 C 40 12 34 20 34 27 L 22 33 L 30 44 L 36 39 L 36 86 L 64 86 L 64 39 L 70 44 L 78 33 L 66 27 C 66 20 60 12 50 12 Z',

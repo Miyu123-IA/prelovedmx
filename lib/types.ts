@@ -3,6 +3,7 @@ export type Genero = 'hombre' | 'mujer' | 'unisex';
 export type Categoria =
   | 'playeras'
   | 'camisas'
+  | 'blusas'
   | 'pantalones'
   | 'chamarras'
   | 'vestidos'

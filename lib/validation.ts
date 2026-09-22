@@ -26,6 +26,7 @@ export const nuevoProductoSchema = z.object({
   categoria: z.enum([
     'playeras',
     'camisas',
+    'blusas',
     'pantalones',
     'chamarras',
     'vestidos',
