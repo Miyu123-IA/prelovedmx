@@ -1,0 +1,263 @@
+[
+  {
+    "id": "p001",
+    "nombre": "Polo clásico piqué",
+    "marca": "Lacoste",
+    "genero": "hombre",
+    "categoria": "playeras",
+    "talla": "M",
+    "medidas": {
+      "pecho_cm": 52,
+      "largo_cm": 71,
+      "manga_cm": 24
+    },
+    "estado": {
+      "puntuacion": 8,
+      "nota": "Ligero desgaste en el cocodrilo bordado, casi imperceptible."
+    },
+    "material": "Piqué de algodón 100%",
+    "color": "Verde botella",
+    "precio_venta": 450,
+    "precio_costo": 180,
+    "origen": "consignacion",
+    "consignatario": {
+      "nombre": "Ana Ibarra",
+      "porcentaje": 60
+    },
+    "fotos": [
+      "placeholder"
+    ],
+    "estatus": "disponible",
+    "fecha_ingreso": "2026-08-20",
+    "tags": [
+      "preppy",
+      "clasico"
+    ]
+  },
+  {
+    "id": "p002",
+    "nombre": "Camisa a rayas manga larga",
+    "marca": "Polo Ralph Lauren",
+    "genero": "hombre",
+    "categoria": "camisas",
+    "talla": "L",
+    "medidas": {
+      "pecho_cm": 56,
+      "largo_cm": 76,
+      "manga_cm": 63
+    },
+    "estado": {
+      "puntuacion": 9,
+      "nota": "Como nueva, sin defectos visibles."
+    },
+    "material": "Algodón oxford",
+    "color": "Azul y blanco",
+    "precio_venta": 380,
+    "precio_costo": 0,
+    "origen": "donacion",
+    "fotos": [
+      "placeholder"
+    ],
+    "estatus": "disponible",
+    "fecha_ingreso": "2026-08-25",
+    "tags": [
+      "casual",
+      "oficina"
+    ]
+  },
+  {
+    "id": "p003",
+    "nombre": "Vestido midi floral",
+    "marca": "Zara",
+    "genero": "mujer",
+    "categoria": "vestidos",
+    "talla": "S",
+    "medidas": {
+      "largo_cm": 105,
+      "cintura_cm": 68,
+      "cadera_cm": 92
+    },
+    "estado": {
+      "puntuacion": 9
+    },
+    "material": "Viscosa",
+    "color": "Estampado floral crema",
+    "precio_venta": 320,
+    "precio_costo": 120,
+    "origen": "consignacion",
+    "consignatario": {
+      "nombre": "Renata Solís",
+      "porcentaje": 55
+    },
+    "fotos": [
+      "placeholder"
+    ],
+    "estatus": "disponible",
+    "fecha_ingreso": "2026-09-01",
+    "tags": [
+      "verano",
+      "romantico"
+    ]
+  },
+  {
+    "id": "p004",
+    "nombre": "Jeans 501 tiro alto",
+    "marca": "Levi's",
+    "genero": "unisex",
+    "categoria": "pantalones",
+    "talla": "32",
+    "medidas": {
+      "cintura_cm": 82,
+      "largo_cm": 104
+    },
+    "estado": {
+      "puntuacion": 7,
+      "nota": "Desgaste natural en bastilla, típico del vintage."
+    },
+    "material": "Mezclilla 100% algodón",
+    "color": "Azul medio",
+    "precio_venta": 480,
+    "precio_costo": 200,
+    "origen": "consignacion",
+    "consignatario": {
+      "nombre": "Marco Tirado",
+      "porcentaje": 60
+    },
+    "fotos": [
+      "placeholder"
+    ],
+    "estatus": "disponible",
+    "fecha_ingreso": "2026-08-15",
+    "tags": [
+      "vintage",
+      "denim"
+    ]
+  },
+  {
+    "id": "p005",
+    "nombre": "Chamarra bomber vintage",
+    "marca": "Members Only",
+    "genero": "unisex",
+    "categoria": "chamarras",
+    "talla": "M",
+    "medidas": {
+      "pecho_cm": 54,
+      "largo_cm": 68,
+      "manga_cm": 61
+    },
+    "estado": {
+      "puntuacion": 8,
+      "nota": "Forro interior con una costura reforzada, no afecta el uso."
+    },
+    "material": "Nylon",
+    "color": "Negro",
+    "precio_venta": 650,
+    "precio_costo": 0,
+    "origen": "donacion",
+    "fotos": [
+      "placeholder"
+    ],
+    "estatus": "disponible",
+    "fecha_ingreso": "2026-07-30",
+    "tags": [
+      "vintage",
+      "80s"
+    ]
+  },
+  {
+    "id": "p006",
+    "nombre": "Sudadera con capucha",
+    "marca": "Nike",
+    "genero": "unisex",
+    "categoria": "sudaderas",
+    "talla": "L",
+    "medidas": {
+      "pecho_cm": 58,
+      "largo_cm": 70
+    },
+    "estado": {
+      "puntuacion": 9
+    },
+    "material": "Algodón/poliéster",
+    "color": "Gris jaspe",
+    "precio_venta": 380,
+    "precio_costo": 150,
+    "origen": "consignacion",
+    "consignatario": {
+      "nombre": "Diego Peña",
+      "porcentaje": 55
+    },
+    "fotos": [
+      "placeholder"
+    ],
+    "estatus": "apartado",
+    "fecha_ingreso": "2026-09-05",
+    "tags": [
+      "deportivo",
+      "casual"
+    ]
+  },
+  {
+    "id": "p007",
+    "nombre": "Falda plisada midi",
+    "marca": "Zara",
+    "genero": "mujer",
+    "categoria": "faldas",
+    "talla": "M",
+    "medidas": {
+      "cintura_cm": 70,
+      "largo_cm": 78
+    },
+    "estado": {
+      "puntuacion": 10
+    },
+    "material": "Poliéster plisado",
+    "color": "Mostaza",
+    "precio_venta": 290,
+    "precio_costo": 0,
+    "origen": "donacion",
+    "fotos": [
+      "placeholder"
+    ],
+    "estatus": "disponible",
+    "fecha_ingreso": "2026-09-08",
+    "tags": [
+      "oficina",
+      "otoño"
+    ]
+  },
+  {
+    "id": "p008",
+    "nombre": "Playera vintage banda de rock",
+    "marca": "Harley Davidson",
+    "genero": "unisex",
+    "categoria": "playeras",
+    "talla": "L",
+    "medidas": {
+      "pecho_cm": 55,
+      "largo_cm": 72
+    },
+    "estado": {
+      "puntuacion": 7,
+      "nota": "Estampado con craquelado ligero, le da carácter vintage auténtico."
+    },
+    "material": "Algodón",
+    "color": "Negro desgastado",
+    "precio_venta": 420,
+    "precio_costo": 160,
+    "origen": "consignacion",
+    "consignatario": {
+      "nombre": "Ana Ibarra",
+      "porcentaje": 60
+    },
+    "fotos": [
+      "placeholder"
+    ],
+    "estatus": "vendido",
+    "fecha_ingreso": "2026-07-10",
+    "tags": [
+      "vintage",
+      "grafica"
+    ]
+  }
+]
