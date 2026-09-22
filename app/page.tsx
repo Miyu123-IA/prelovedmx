@@ -33,7 +33,7 @@ export default function HomePage() {
               </Link>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="hidden grid-cols-2 gap-3 md:grid">
             <div className="aspect-square rounded-card bg-olivo/30" />
             <div className="mt-6 aspect-square rounded-card bg-mostaza/30" />
             <div className="-mt-6 aspect-square rounded-card bg-terracota/30" />

@@ -22,8 +22,16 @@ function leerJSON<T>(archivo: string, fallback: T): T {
 }
 
 function escribirJSON(archivo: string, data: unknown) {
-  fs.mkdirSync(path.dirname(archivo), { recursive: true });
-  fs.writeFileSync(archivo, JSON.stringify(data, null, 2), 'utf-8');
+  try {
+    fs.mkdirSync(path.dirname(archivo), { recursive: true });
+    fs.writeFileSync(archivo, JSON.stringify(data, null, 2), 'utf-8');
+  } catch (err) {
+    // En hosting serverless (Vercel) el sistema de archivos del deploy es de
+    // solo lectura: el cambio no persiste. No tronamos la petición por esto
+    // -mientras el inventario viva en Google Sheets vía el bot de Telegram,
+    // este archivo deja de ser la fuente de verdad-, solo lo dejamos en log.
+    console.warn(`No se pudo escribir ${archivo} (¿filesystem de solo lectura?):`, err);
+  }
 }
 
 function generarId(prefijo: string): string {
