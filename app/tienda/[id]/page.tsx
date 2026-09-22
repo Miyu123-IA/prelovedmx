@@ -9,8 +9,8 @@ interface Props {
   params: { id: string };
 }
 
-export default function ProductoPage({ params }: Props) {
-  const producto = obtenerProducto(params.id);
+export default async function ProductoPage({ params }: Props) {
+  const producto = await obtenerProducto(params.id);
   if (!producto) notFound();
 
   const medidasLegibles = Object.entries(producto.medidas)

@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
 
   const { nombre, telefono, entrega, direccion, items } = parsed.data;
 
-  const productos = items.map((id) => obtenerProducto(id)).filter((p) => p !== undefined);
+  const productos = (await Promise.all(items.map((id) => obtenerProducto(id)))).filter((p) => p !== undefined);
   const noDisponibles = productos.filter((p) => p!.estatus !== 'disponible');
 
   if (productos.length !== items.length) {
@@ -31,9 +31,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  for (const p of productos) {
-    actualizarEstatusProducto(p!.id, 'apartado');
-  }
+  await Promise.all(productos.map((p) => actualizarEstatusProducto(p!.id, 'apartado')));
 
   const total = productos.reduce((sum, p) => sum + p!.precio_venta, 0);
   const listado = productos.map((p) => `• ${p!.nombre} (${p!.marca}, talla ${p!.talla}) — ${formatoMXN(p!.precio_venta)}`).join('\n');

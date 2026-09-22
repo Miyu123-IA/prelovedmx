@@ -9,7 +9,7 @@ interface Props {
   searchParams: Record<string, string | undefined>;
 }
 
-export default function TiendaPage({ searchParams }: Props) {
+export default async function TiendaPage({ searchParams }: Props) {
   const filtros: FiltrosProducto = {
     genero: (searchParams.genero as FiltrosProducto['genero']) || undefined,
     marca: searchParams.marca || undefined,
@@ -23,9 +23,9 @@ export default function TiendaPage({ searchParams }: Props) {
     estatus: undefined,
   };
 
-  const productos = listarProductos(filtros).filter((p) => p.estatus !== 'vendido');
-  const marcas = marcasDisponibles();
-  const tallas = tallasDisponibles();
+  const productos = (await listarProductos(filtros)).filter((p) => p.estatus !== 'vendido');
+  const marcas = await marcasDisponibles();
+  const tallas = await tallasDisponibles();
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">

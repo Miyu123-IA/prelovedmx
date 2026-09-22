@@ -11,10 +11,15 @@ npm run dev
 
 Abre http://localhost:3000
 
-## Cómo alimentar el inventario desde el bot
+## Cómo alimentar el inventario
 
-Los productos viven en `data/products.json` a través de `lib/db.ts`. El bot no
-debe tocar ese archivo directamente: usa la API REST.
+Hay dos formas, ambas pasan por `lib/db.ts` (que decide solo si usa Google
+Sheets o el JSON local — ver "Google Sheets + bot de Telegram" abajo):
+
+1. **Bot de Telegram** (`@Preloved_inventario_bot`): `/nuevo` y responde las
+   preguntas — marca, categoría, talla, precio, fotos, etc. Pensado para
+   subir inventario desde el celular sin tocar código.
+2. **API REST directa**, por si más adelante conectas otra herramienta.
 
 **Crear una prenda** — `POST /api/products`
 
@@ -53,19 +58,46 @@ debe tocar ese archivo directamente: usa la API REST.
 `data/ofertas.json` vía `POST /api/ofertas` — revísalas ahí o conecta el bot
 para que te avise cuando entre una nueva.
 
-## Migrar a una base de datos real
+## Google Sheets + bot de Telegram
 
-Todo el acceso a datos pasa por `lib/db.ts`. Para usar Postgres/Supabase/MySQL
-en vez del archivo JSON, reescribe las funciones de ese archivo manteniendo
-las mismas firmas — nada más en la app necesita cambiar.
+`lib/db.ts` usa Google Sheets automáticamente en cuanto detecta
+`GOOGLE_SHEET_ID` + las credenciales de la cuenta de servicio; si no,
+sigue usando `data/products.json` (así el desarrollo local no depende de
+tener esas credenciales a la mano). En Vercel, ese archivo JSON es de solo
+lectura en producción de cualquier forma, así que en producción **Sheets no
+es opcional** — sin configurarlo, crear/actualizar productos no persiste.
 
-**Plan acordado:** migrar `lib/db.ts` para leer/escribir un Google Sheet (el
-bot de Telegram del inventario escribe ahí directamente). Mientras eso no
-esté conectado, el sitio corre con `data/products.json` — en Vercel ese
-archivo es de solo lectura en producción, así que las escrituras (crear
-producto, marcar apartado/vendido, enviar oferta) no persisten entre
-despliegues; `lib/db.ts` ya no truena por esto (ver `escribirJSON`), solo
-deja de guardar el cambio.
+**Variables de entorno** (ver `.env.example` para la lista completa):
+
+| Variable | De dónde sale |
+|---|---|
+| `GOOGLE_SHEET_ID` | El ID en la URL del Sheet: `docs.google.com/spreadsheets/d/`**`ESTE_ID`**`/edit` |
+| `GOOGLE_DRIVE_FOLDER_ID` | El ID en la URL de la carpeta de Drive para fotos |
+| `GOOGLE_SERVICE_ACCOUNT_EMAIL` | Campo `client_email` del JSON de la cuenta de servicio |
+| `GOOGLE_PRIVATE_KEY` | Campo `private_key` del mismo JSON (con los `\n` tal cual, en una sola línea) |
+| `TELEGRAM_BOT_TOKEN` | Te lo da @BotFather al crear el bot |
+| `TELEGRAM_WEBHOOK_SECRET` | Cualquier cadena aleatoria que tú inventes |
+| `TELEGRAM_ALLOWED_CHAT_IDS` | Chat IDs de Telegram con permiso de usar el bot, separados por coma |
+| `ADMIN_SETUP_SECRET` | Otra cadena aleatoria, para proteger `/api/admin/setup` |
+
+**Importante:** la cuenta de servicio necesita acceso de **Editor** tanto al
+Google Sheet como a la carpeta de Drive de las fotos — compártelos con el
+email de `GOOGLE_SERVICE_ACCOUNT_EMAIL` como harías con cualquier persona.
+
+**Después de configurar las variables en Vercel** (Project → Settings →
+Environment Variables → redeploy), corre una sola vez:
+
+```
+GET https://tu-dominio/api/admin/setup?secret=EL_ADMIN_SETUP_SECRET
+```
+
+Esto crea las pestañas y encabezados del Sheet (`Productos`, `Ofertas`,
+`BotEstado`) si no existen, y registra el webhook del bot con Telegram. La
+respuesta te confirma si cada paso funcionó.
+
+**Para migrar a Postgres/Supabase/MySQL** en vez de Sheets: reescribe
+`lib/sheets.ts` manteniendo las mismas firmas de función — `lib/db.ts` y el
+resto de la app no necesitan cambiar.
 
 ## Desplegar en Vercel
 
@@ -96,7 +128,6 @@ deja de guardar el cambio.
   Next). El sitio no usa `next/image` ni sube imágenes de usuarios, así que
   la superficie de ataque real es baja, pero conviene subir a Next 15/16
   más adelante (cambio mayor, requiere probar todo de nuevo).
-- Bot de Telegram + Google Sheet para subir inventario (marca, categoría,
-  precio, fotos, disponibilidad): pendiente para la siguiente sesión. Hace
-  falta un token de bot (@BotFather) y una cuenta de servicio de Google con
-  acceso al Sheet.
+- Bot de Telegram y capa de Google Sheets ya están escritos (`lib/telegram*.ts`,
+  `lib/sheets.ts`); falta cargar las variables de entorno en Vercel y correr
+  `/api/admin/setup` una vez — ver "Google Sheets + bot de Telegram" arriba.

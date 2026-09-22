@@ -8,6 +8,6 @@ export async function POST(req: NextRequest) {
   if (!parsed.success) {
     return NextResponse.json({ error: 'Datos inválidos', detalles: parsed.error.flatten() }, { status: 400 });
   }
-  const oferta = crearOferta(parsed.data);
+  const oferta = await crearOferta(parsed.data);
   return NextResponse.json({ oferta }, { status: 201 });
 }

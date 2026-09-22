@@ -5,9 +5,9 @@ import { TIENDA } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 
-export default function HomePage() {
-  const recientes = listarProductos({ estatus: 'disponible', orden: 'recientes' }).slice(0, 4);
-  const marcas = marcasDisponibles();
+export default async function HomePage() {
+  const recientes = (await listarProductos({ estatus: 'disponible', orden: 'recientes' })).slice(0, 4);
+  const marcas = await marcasDisponibles();
 
   return (
     <div>

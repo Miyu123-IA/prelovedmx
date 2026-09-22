@@ -1,11 +1,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import type { FiltrosProducto, NuevoProducto, OfertaConsignacion, Producto } from './types';
+import type { Estatus, FiltrosProducto, NuevoProducto, OfertaConsignacion, Producto } from './types';
+import * as sheets from './sheets';
 
 /**
- * Almacenamiento en archivo JSON. Cambia SOLO este archivo (mismas firmas de
- * función) para migrar a Postgres/Supabase/MySQL sin tocar rutas de API,
- * páginas ni al bot que alimenta el inventario.
+ * Fuente de datos del inventario: Google Sheets si está configurado
+ * (GOOGLE_SHEET_ID + credenciales de la cuenta de servicio — así es como
+ * escribe el bot de Telegram), si no, un archivo JSON local para desarrollo
+ * sin esas credenciales a la mano. Todo lo demás en la app llama estas
+ * funciones sin saber cuál de las dos está activa.
  */
 
 const DATA_DIR = path.join(process.cwd(), 'data');
@@ -28,8 +31,8 @@ function escribirJSON(archivo: string, data: unknown) {
   } catch (err) {
     // En hosting serverless (Vercel) el sistema de archivos del deploy es de
     // solo lectura: el cambio no persiste. No tronamos la petición por esto
-    // -mientras el inventario viva en Google Sheets vía el bot de Telegram,
-    // este archivo deja de ser la fuente de verdad-, solo lo dejamos en log.
+    // -en producción debería estar configurado Google Sheets de cualquier
+    // forma-, solo lo dejamos en log.
     console.warn(`No se pudo escribir ${archivo} (¿filesystem de solo lectura?):`, err);
   }
 }
@@ -40,9 +43,7 @@ function generarId(prefijo: string): string {
     .padStart(2, '0')}`;
 }
 
-export function listarProductos(filtros: FiltrosProducto = {}): Producto[] {
-  let productos = leerJSON<Producto[]>(PRODUCTS_FILE, []);
-
+function filtrarProductos(productos: Producto[], filtros: FiltrosProducto): Producto[] {
   if (filtros.genero) {
     productos = productos.filter((p) => p.genero === filtros.genero || p.genero === 'unisex');
   }
@@ -76,7 +77,6 @@ export function listarProductos(filtros: FiltrosProducto = {}): Producto[] {
         p.tags.some((t) => t.toLowerCase().includes(q))
     );
   }
-
   switch (filtros.orden) {
     case 'precio_asc':
       productos.sort((a, b) => a.precio_venta - b.precio_venta);
@@ -87,15 +87,22 @@ export function listarProductos(filtros: FiltrosProducto = {}): Producto[] {
     default:
       productos.sort((a, b) => new Date(b.fecha_ingreso).getTime() - new Date(a.fecha_ingreso).getTime());
   }
-
   return productos;
 }
 
-export function obtenerProducto(id: string): Producto | undefined {
+export async function listarProductos(filtros: FiltrosProducto = {}): Promise<Producto[]> {
+  if (sheets.sheetsConfigurado()) return sheets.listarProductosSheet(filtros);
+  const productos = leerJSON<Producto[]>(PRODUCTS_FILE, []);
+  return filtrarProductos(productos, filtros);
+}
+
+export async function obtenerProducto(id: string): Promise<Producto | undefined> {
+  if (sheets.sheetsConfigurado()) return sheets.obtenerProductoSheet(id);
   return leerJSON<Producto[]>(PRODUCTS_FILE, []).find((p) => p.id === id);
 }
 
-export function crearProducto(nuevo: NuevoProducto): Producto {
+export async function crearProducto(nuevo: NuevoProducto): Promise<Producto> {
+  if (sheets.sheetsConfigurado()) return sheets.crearProductoSheet(nuevo);
   const productos = leerJSON<Producto[]>(PRODUCTS_FILE, []);
   const producto: Producto = {
     ...nuevo,
@@ -108,7 +115,8 @@ export function crearProducto(nuevo: NuevoProducto): Producto {
   return producto;
 }
 
-export function actualizarEstatusProducto(id: string, estatus: Producto['estatus']): Producto | undefined {
+export async function actualizarEstatusProducto(id: string, estatus: Estatus): Promise<Producto | undefined> {
+  if (sheets.sheetsConfigurado()) return sheets.actualizarEstatusProductoSheet(id, estatus);
   const productos = leerJSON<Producto[]>(PRODUCTS_FILE, []);
   const idx = productos.findIndex((p) => p.id === id);
   if (idx === -1) return undefined;
@@ -117,17 +125,20 @@ export function actualizarEstatusProducto(id: string, estatus: Producto['estatus
   return productos[idx];
 }
 
-export function marcasDisponibles(): string[] {
+export async function marcasDisponibles(): Promise<string[]> {
+  if (sheets.sheetsConfigurado()) return sheets.marcasDisponiblesSheet();
   const productos = leerJSON<Producto[]>(PRODUCTS_FILE, []);
   return Array.from(new Set(productos.map((p) => p.marca))).sort();
 }
 
-export function tallasDisponibles(): string[] {
+export async function tallasDisponibles(): Promise<string[]> {
+  if (sheets.sheetsConfigurado()) return sheets.tallasDisponiblesSheet();
   const productos = leerJSON<Producto[]>(PRODUCTS_FILE, []);
   return Array.from(new Set(productos.map((p) => p.talla))).sort();
 }
 
-export function crearOferta(oferta: Omit<OfertaConsignacion, 'id' | 'fecha' | 'estatus'>): OfertaConsignacion {
+export async function crearOferta(oferta: Omit<OfertaConsignacion, 'id' | 'fecha' | 'estatus'>): Promise<OfertaConsignacion> {
+  if (sheets.sheetsConfigurado()) return sheets.crearOfertaSheet(oferta);
   const ofertas = leerJSON<OfertaConsignacion[]>(OFERTAS_FILE, []);
   const nueva: OfertaConsignacion = {
     ...oferta,

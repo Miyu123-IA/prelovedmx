@@ -7,7 +7,7 @@ const patchSchema = z.object({
 });
 
 export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
-  const producto = obtenerProducto(params.id);
+  const producto = await obtenerProducto(params.id);
   if (!producto) {
     return NextResponse.json({ error: 'Producto no encontrado.' }, { status: 404 });
   }
@@ -20,7 +20,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   if (!parsed.success) {
     return NextResponse.json({ error: 'Datos inválidos', detalles: parsed.error.flatten() }, { status: 400 });
   }
-  const producto = actualizarEstatusProducto(params.id, parsed.data.estatus);
+  const producto = await actualizarEstatusProducto(params.id, parsed.data.estatus);
   if (!producto) {
     return NextResponse.json({ error: 'Producto no encontrado.' }, { status: 404 });
   }

@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
     orden: (sp.get('orden') as FiltrosProducto['orden']) || undefined,
   };
 
-  const productos = listarProductos(filtros);
+  const productos = await listarProductos(filtros);
   return NextResponse.json({ productos, total: productos.length });
 }
 
@@ -43,6 +43,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Datos inválidos', detalles: parsed.error.flatten() }, { status: 400 });
   }
 
-  const producto = crearProducto(parsed.data);
+  const producto = await crearProducto(parsed.data);
   return NextResponse.json({ producto }, { status: 201 });
 }
