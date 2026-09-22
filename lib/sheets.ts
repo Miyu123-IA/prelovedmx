@@ -53,14 +53,23 @@ const COLUMNAS_PRODUCTOS = [
 const COLUMNAS_OFERTAS = ['id', 'nombre', 'telefono', 'email', 'descripcion', 'modalidad', 'fotos', 'fecha', 'estatus'] as const;
 
 export function sheetsConfigurado(): boolean {
-  return Boolean(SHEET_ID && process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL && process.env.GOOGLE_PRIVATE_KEY);
+  return Boolean(
+    SHEET_ID &&
+      process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL &&
+      (process.env.GOOGLE_PRIVATE_KEY_B64 || process.env.GOOGLE_PRIVATE_KEY)
+  );
 }
 
 function credenciales() {
   const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
-  const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+  let privateKey = process.env.GOOGLE_PRIVATE_KEY_B64
+    ? Buffer.from(process.env.GOOGLE_PRIVATE_KEY_B64, 'base64').toString('utf-8')
+    : process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+  // Pegar la clave en un panel web a veces deja comillas o espacios de sobra
+  // que rompen el PEM; los quitamos por si acaso.
+  privateKey = privateKey?.trim().replace(/^"|"$/g, '');
   if (!email || !privateKey) {
-    throw new Error('Faltan GOOGLE_SERVICE_ACCOUNT_EMAIL / GOOGLE_PRIVATE_KEY en las variables de entorno.');
+    throw new Error('Faltan GOOGLE_SERVICE_ACCOUNT_EMAIL / GOOGLE_PRIVATE_KEY(_B64) en las variables de entorno.');
   }
   return { email, privateKey };
 }
