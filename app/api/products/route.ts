@@ -26,8 +26,13 @@ export async function GET(req: NextRequest) {
     orden: (sp.get('orden') as FiltrosProducto['orden']) || undefined,
   };
 
-  const productos = await listarProductos(filtros);
-  return NextResponse.json({ productos, total: productos.length });
+  try {
+    const productos = await listarProductos(filtros);
+    return NextResponse.json({ productos, total: productos.length });
+  } catch (err) {
+    console.error('GET /api/products falló:', err);
+    return NextResponse.json({ error: 'No pudimos leer el inventario.' }, { status: 500 });
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -43,6 +48,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Datos inválidos', detalles: parsed.error.flatten() }, { status: 400 });
   }
 
-  const producto = await crearProducto(parsed.data);
-  return NextResponse.json({ producto }, { status: 201 });
+  try {
+    const producto = await crearProducto(parsed.data);
+    return NextResponse.json({ producto }, { status: 201 });
+  } catch (err) {
+    console.error('POST /api/products falló:', err);
+    return NextResponse.json({ error: 'No pudimos guardar el producto.' }, { status: 500 });
+  }
 }

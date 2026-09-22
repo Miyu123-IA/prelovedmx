@@ -37,6 +37,20 @@ function escribirJSON(archivo: string, data: unknown) {
   }
 }
 
+/**
+ * Para lecturas: si Sheets está configurado pero falla (credenciales mal
+ * pegadas, Sheet sin compartir, etc.) preferimos mostrarle algo a la
+ * clienta -aunque sea el catálogo de ejemplo- a tronar la página entera.
+ */
+async function leerConFallback<T>(intento: () => Promise<T>, fallback: () => T): Promise<T> {
+  try {
+    return await intento();
+  } catch (err) {
+    console.error('Google Sheets falló, usando data/*.json de respaldo:', err);
+    return fallback();
+  }
+}
+
 function generarId(prefijo: string): string {
   return `${prefijo}${Date.now().toString(36)}${Math.floor(Math.random() * 1000)
     .toString(36)
@@ -91,13 +105,23 @@ function filtrarProductos(productos: Producto[], filtros: FiltrosProducto): Prod
 }
 
 export async function listarProductos(filtros: FiltrosProducto = {}): Promise<Producto[]> {
-  if (sheets.sheetsConfigurado()) return sheets.listarProductosSheet(filtros);
+  if (sheets.sheetsConfigurado()) {
+    return leerConFallback(
+      () => sheets.listarProductosSheet(filtros),
+      () => filtrarProductos(leerJSON<Producto[]>(PRODUCTS_FILE, []), filtros)
+    );
+  }
   const productos = leerJSON<Producto[]>(PRODUCTS_FILE, []);
   return filtrarProductos(productos, filtros);
 }
 
 export async function obtenerProducto(id: string): Promise<Producto | undefined> {
-  if (sheets.sheetsConfigurado()) return sheets.obtenerProductoSheet(id);
+  if (sheets.sheetsConfigurado()) {
+    return leerConFallback(
+      () => sheets.obtenerProductoSheet(id),
+      () => leerJSON<Producto[]>(PRODUCTS_FILE, []).find((p) => p.id === id)
+    );
+  }
   return leerJSON<Producto[]>(PRODUCTS_FILE, []).find((p) => p.id === id);
 }
 
@@ -126,13 +150,23 @@ export async function actualizarEstatusProducto(id: string, estatus: Estatus): P
 }
 
 export async function marcasDisponibles(): Promise<string[]> {
-  if (sheets.sheetsConfigurado()) return sheets.marcasDisponiblesSheet();
+  if (sheets.sheetsConfigurado()) {
+    return leerConFallback(
+      () => sheets.marcasDisponiblesSheet(),
+      () => Array.from(new Set(leerJSON<Producto[]>(PRODUCTS_FILE, []).map((p) => p.marca))).sort()
+    );
+  }
   const productos = leerJSON<Producto[]>(PRODUCTS_FILE, []);
   return Array.from(new Set(productos.map((p) => p.marca))).sort();
 }
 
 export async function tallasDisponibles(): Promise<string[]> {
-  if (sheets.sheetsConfigurado()) return sheets.tallasDisponiblesSheet();
+  if (sheets.sheetsConfigurado()) {
+    return leerConFallback(
+      () => sheets.tallasDisponiblesSheet(),
+      () => Array.from(new Set(leerJSON<Producto[]>(PRODUCTS_FILE, []).map((p) => p.talla))).sort()
+    );
+  }
   const productos = leerJSON<Producto[]>(PRODUCTS_FILE, []);
   return Array.from(new Set(productos.map((p) => p.talla))).sort();
 }

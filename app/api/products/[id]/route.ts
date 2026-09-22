@@ -20,9 +20,14 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   if (!parsed.success) {
     return NextResponse.json({ error: 'Datos inválidos', detalles: parsed.error.flatten() }, { status: 400 });
   }
-  const producto = await actualizarEstatusProducto(params.id, parsed.data.estatus);
-  if (!producto) {
-    return NextResponse.json({ error: 'Producto no encontrado.' }, { status: 404 });
+  try {
+    const producto = await actualizarEstatusProducto(params.id, parsed.data.estatus);
+    if (!producto) {
+      return NextResponse.json({ error: 'Producto no encontrado.' }, { status: 404 });
+    }
+    return NextResponse.json({ producto });
+  } catch (err) {
+    console.error('PATCH /api/products/[id] falló:', err);
+    return NextResponse.json({ error: 'No pudimos actualizar el producto.' }, { status: 500 });
   }
-  return NextResponse.json({ producto });
 }
