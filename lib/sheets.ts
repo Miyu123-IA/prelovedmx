@@ -1,4 +1,5 @@
 import { google } from 'googleapis';
+import { Readable } from 'node:stream';
 import type {
   Categoria,
   Estatus,
@@ -354,7 +355,6 @@ export async function limpiarEstadoBot(chatId: string): Promise<void> {
 export async function subirFotoADrive(buffer: Buffer, nombreArchivo: string, mimeType: string): Promise<string> {
   const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
   const drive = driveClient();
-  const { Readable } = await import('node:stream');
 
   const { data } = await drive.files.create({
     requestBody: { name: nombreArchivo, parents: folderId ? [folderId] : undefined },

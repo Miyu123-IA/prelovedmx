@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { procesarActualizacion } from '@/lib/telegram-bot';
-import type { TelegramUpdate } from '@/lib/telegram';
+import { enviarMensaje, type TelegramUpdate } from '@/lib/telegram';
 
 /**
  * Telegram llama aquí (POST) cada vez que alguien le escribe al bot.
@@ -25,6 +25,10 @@ export async function POST(req: NextRequest) {
     await procesarActualizacion(update);
   } catch (err) {
     console.error('Error procesando update de Telegram:', err);
+    const chatId = update.message?.chat.id ?? update.callback_query?.message?.chat.id;
+    if (chatId) {
+      await enviarMensaje(chatId, '⚠️ Algo falló de mi lado. Intenta de nuevo o escribe /cancelar y vuelve a empezar con /nuevo.').catch(() => {});
+    }
   }
 
   // Siempre 200: si le respondemos error a Telegram, reintenta el mismo

@@ -220,12 +220,17 @@ async function manejarFoto(chatId: number, fileId: string) {
     return;
   }
 
-  const url = await subirFotoADrive(archivo.buffer, `${Date.now()}-${fileId}.jpg`, archivo.mimeType);
-  const fotos = (estado.datos.fotos as string[] | undefined) ?? [];
-  fotos.push(url);
-  estado.datos.fotos = fotos;
-  await guardarEstadoBot(estado);
-  await enviarMensaje(chatId, `Foto ${fotos.length} agregada ✅. Manda otra o escribe /listo.`);
+  try {
+    const url = await subirFotoADrive(archivo.buffer, `${Date.now()}-${fileId}.jpg`, archivo.mimeType);
+    const fotos = (estado.datos.fotos as string[] | undefined) ?? [];
+    fotos.push(url);
+    estado.datos.fotos = fotos;
+    await guardarEstadoBot(estado);
+    await enviarMensaje(chatId, `Foto ${fotos.length} agregada ✅. Manda otra o escribe /listo.`);
+  } catch (err) {
+    console.error('subirFotoADrive falló:', err);
+    await enviarMensaje(chatId, '⚠️ No pude subir esa foto a Drive. Intenta mandarla otra vez.');
+  }
 }
 
 async function manejarCallback(chatId: number, callbackId: string, data: string) {
