@@ -1,5 +1,5 @@
 import { actualizarEstatusProducto, crearProducto, listarProductos } from './db';
-import { subirFotoADrive } from './sheets';
+import { subirFoto } from './fotos';
 import { obtenerEstadoBot, guardarEstadoBot, limpiarEstadoBot, type EstadoBot } from './sheets';
 import { enviarMensaje, responderCallback, obtenerArchivo, type TelegramUpdate } from './telegram';
 import { CATEGORIAS, GENEROS, formatoMXN } from './utils';
@@ -228,15 +228,15 @@ async function manejarFoto(chatId: number, fileId: string) {
   }
 
   try {
-    const url = await subirFotoADrive(archivo.buffer, `${Date.now()}-${fileId}.jpg`, archivo.mimeType);
+    const url = await subirFoto(archivo.buffer, `${Date.now()}-${fileId}.jpg`, archivo.mimeType);
     const fotos = (estado.datos.fotos as string[] | undefined) ?? [];
     fotos.push(url);
     estado.datos.fotos = fotos;
     await guardarEstadoBot(estado);
     await enviarMensaje(chatId, `Foto ${fotos.length} agregada ✅. Manda otra o dime "listo".`);
   } catch (err) {
-    console.error('subirFotoADrive falló:', err);
-    await enviarMensaje(chatId, '⚠️ No pude subir esa foto a Drive. Intenta mandarla otra vez.');
+    console.error('subirFoto falló:', err);
+    await enviarMensaje(chatId, '⚠️ No pude subir esa foto. Intenta mandarla otra vez.');
   }
 }
 

@@ -1,5 +1,4 @@
 import { google } from 'googleapis';
-import { Readable } from 'node:stream';
 import type {
   Categoria,
   Estatus,
@@ -80,16 +79,12 @@ function auth() {
   return new google.auth.JWT({
     email,
     key: privateKey,
-    scopes: ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive'],
+    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
   });
 }
 
 function sheetsClient() {
   return google.sheets({ version: 'v4', auth: auth() });
-}
-
-export function driveClient() {
-  return google.drive({ version: 'v3', auth: auth() });
 }
 
 function colLetter(index: number): string {
@@ -348,23 +343,6 @@ export async function guardarEstadoBot(estado: EstadoBot): Promise<void> {
 
 export async function limpiarEstadoBot(chatId: string): Promise<void> {
   await guardarEstadoBot({ chatId, paso: 'inicio', datos: {} });
-}
-
-// --- Fotos: se descargan de Telegram y se re-suben a una carpeta de Drive ---
-
-export async function subirFotoADrive(buffer: Buffer, nombreArchivo: string, mimeType: string): Promise<string> {
-  const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
-  const drive = driveClient();
-
-  const { data } = await drive.files.create({
-    requestBody: { name: nombreArchivo, parents: folderId ? [folderId] : undefined },
-    media: { mimeType, body: Readable.from(buffer) },
-    fields: 'id',
-  });
-
-  const fileId = data.id!;
-  await drive.permissions.create({ fileId, requestBody: { role: 'reader', type: 'anyone' } });
-  return `https://drive.google.com/uc?export=view&id=${fileId}`;
 }
 
 /** Crea las pestañas y encabezados si el Sheet está vacío. Segura de correr varias veces. */
