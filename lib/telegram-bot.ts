@@ -7,6 +7,13 @@ import type { Categoria, Estatus, Genero, Origen } from './types';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://prelovedmx.vercel.app';
 
+const PALABRAS_TERMINO = ['listo', 'ya', 'ya no', 'ya está', 'ya esta', 'terminé', 'termine', 'acabé', 'acabe', 'eso es todo', 'no hay más', 'no hay mas', 'fin'];
+
+function esSeñalDeTermino(texto: string): boolean {
+  const t = texto.trim().toLowerCase().replace(/[.!¡]/g, '');
+  return t === '/listo' || PALABRAS_TERMINO.includes(t);
+}
+
 function chatIdsAutorizados(): string[] | null {
   const raw = process.env.TELEGRAM_ALLOWED_CHAT_IDS;
   if (!raw) return null; // null = sin restricción (no recomendado en producción)
@@ -186,20 +193,20 @@ async function manejarTexto(chatId: number, texto: string) {
         return;
       }
       datos.consignatario_porcentaje = pct;
-      await preguntar(chatId, 'esperando_fotos', datos, '📸 Mándame las fotos de la prenda (una o varias). Cuando termines escribe /listo');
+      await preguntar(chatId, 'esperando_fotos', datos, '📸 Mándame las fotos de la prenda (una o varias). Cuando termines, dime "listo"');
       return;
     }
 
     case 'esperando_fotos':
-      if (comando === '/listo') {
+      if (esSeñalDeTermino(texto)) {
         if (!((datos.fotos as string[] | undefined)?.length)) {
-          await enviarMensaje(chatId, 'Necesito al menos una foto antes de publicar. Mándala y luego /listo.');
+          await enviarMensaje(chatId, 'Necesito al menos una foto antes de publicar. Mándala y avísame cuando termines.');
           return;
         }
         await finalizarProducto(chatId, datos);
         return;
       }
-      await enviarMensaje(chatId, 'Mándame la foto, o escribe /listo si ya terminaste.');
+      await enviarMensaje(chatId, 'Mándame la foto, o dime "listo" cuando ya termines.');
       return;
 
     default:
@@ -226,7 +233,7 @@ async function manejarFoto(chatId: number, fileId: string) {
     fotos.push(url);
     estado.datos.fotos = fotos;
     await guardarEstadoBot(estado);
-    await enviarMensaje(chatId, `Foto ${fotos.length} agregada ✅. Manda otra o escribe /listo.`);
+    await enviarMensaje(chatId, `Foto ${fotos.length} agregada ✅. Manda otra o dime "listo".`);
   } catch (err) {
     console.error('subirFotoADrive falló:', err);
     await enviarMensaje(chatId, '⚠️ No pude subir esa foto a Drive. Intenta mandarla otra vez.');
@@ -263,7 +270,7 @@ async function manejarCallback(chatId: number, callbackId: string, data: string)
     if (valor === 'consignacion') {
       await preguntar(chatId, 'esperando_consignatario_nombre', datos, '¿Nombre de quién dejó la prenda en consignación?');
     } else {
-      await preguntar(chatId, 'esperando_fotos', datos, '📸 Mándame las fotos de la prenda (una o varias). Cuando termines escribe /listo');
+      await preguntar(chatId, 'esperando_fotos', datos, '📸 Mándame las fotos de la prenda (una o varias). Cuando termines, dime "listo"');
     }
     return;
   }
